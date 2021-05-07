@@ -7,6 +7,7 @@
 ( () => {
 
   const component = {
+    version: [1,0,0],
     name: 'annotation',
     ccm: 'https://ccmjs.github.io/ccm/versions/ccm-26.4.0.js',
     config: {
@@ -15,23 +16,23 @@
         { "context": "head", "url": "https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" },
         { "url": "https://fonts.googleapis.com/css?family=Material+Icons|Material+Icons+Outlined|Material+Icons+Two+Tone|Material+Icons+Round|Material+Icons+Sharp", "type": "css" },
         { "url": "https://fonts.googleapis.com/css?family=Material+Icons|Material+Icons+Outlined|Material+Icons+Two+Tone|Material+Icons+Round|Material+Icons+Sharp", "type": "css", "context": "head" },
-        "./resources/style.css"
+        "https://hajar808.github.io/annotation/resources/style.css"
       ],
       "helper": [ "ccm.load", "https://ccmjs.github.io/akless-components/modules/versions/helper-7.2.0.mjs" ],
-      "html": [ "ccm.load", "./resources/templates.html" ],
+      "html": [ "ccm.load", "https://hajar808.github.io/annotation/resources/templates.html" ],
       "js": [ "ccm.load",
         [
           "https://code.jquery.com/jquery-3.6.0.min.js",
           "https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js",
-          { "context": "head", "url": "./resources/js/preload.js", "type": "text/javascript" },
-          { "context": "head", "url": "./resources/js/dao.js" },
-          { "context": "head", "url": "./resources/external/annotaion-model.js" },
-          { "context": "head", "url": "./resources/external/highlighter.js" },
-          { "context": "head", "url": "./resources/external/range-util.js" },
-          { "context": "head", "url": "./resources/external/adder.js" },
-          { "context": "head", "url": "./resources/js/selection.handler.js" },
-          { "context": "head", "url": "./resources/js/annotation.card.handler.js" },
-          { "context": "head", "url": "./resources/js/sidebar.js" }
+          { "context": "head", "url": "https://hajar808.github.io/annotation/resources/js/preload.js", "type": "text/javascript" },
+          { "context": "head", "url": "https://hajar808.github.io/annotation/resources/js/dao.js" },
+          { "context": "head", "url": "https://hajar808.github.io/annotation/resources/external/annotaion-model.js" },
+          { "context": "head", "url": "https://hajar808.github.io/annotation/resources/external/highlighter.js" },
+          { "context": "head", "url": "https://hajar808.github.io/annotation/resources/external/range-util.js" },
+          { "context": "head", "url": "https://hajar808.github.io/annotation/resources/external/adder.js" },
+          { "context": "head", "url": "https://hajar808.github.io/annotation/resources/js/selection.handler.js" },
+          { "context": "head", "url": "https://hajar808.github.io/annotation/resources/js/annotation.card.handler.js" },
+          { "context": "head", "url": "https://hajar808.github.io/annotation/resources/js/sidebar.js" }
         ]
       ],
       "title": "Annotation",
