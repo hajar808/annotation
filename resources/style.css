@@ -1,0 +1,220 @@
+
+.hypothesis-highlights-always-on .hypothesis-highlight.hypothesis-highlight-focused {
+	background-color: rgba(156, 230, 255, .5) !important;
+}
+
+.hypothesis-highlights-always-on .hypothesis-highlight.hypothesis-highlight-focused .hypothesis-highlight {
+	background-color: transparent !important;
+}
+
+.hypothesis-highlight-focused {
+    background-color: rgba(156, 230, 255, 0.5) !important;
+
+    
+  }
+
+  hypothesis-highlight {
+      cursor: pointer;
+  }
+
+.annotation-quote {
+   line-height: 1.5;
+   font-style: italic;
+}
+
+.card-action {
+    padding-top: 0 !important;
+}
+
+.card {
+    background-color: lavender !important;
+}
+
+.sidenav {
+   /* width: 30%; */
+   width: 60vh;
+}
+
+.sidenav.open {
+    -webkit-transform: translateX(0%) !important;
+    transform: translateX(0%)  !important;
+}
+
+.sidenav.close {
+    -webkit-transform: translateX(-100%) !important;
+    transform: translateX(-100%)  !important;
+}
+
+.sidenav-overlay {
+    opacity: 0 !important;
+}
+
+.sidenav li {
+    float: left;
+}
+
+.sidenav li>a {
+    padding: 0 15px;
+}
+
+.badge {
+    margin-top: 20px !important;
+}
+
+.nav-item {
+    /*
+    float: left;
+    padding-left: 5%;
+    padding-right: 5%;
+    */
+}
+
+.dropdown-item {
+    width: unset !important;
+}
+
+.notes-menu {
+    
+    margin-right: 0%;
+    float: right;     
+    position: fixed;
+    top: 50px;
+    right: 0;
+    z-index: 3;
+    padding: 0 8px;
+}
+
+.toggle-highlight {
+    margin-right: 0%;
+    float: right;     
+    position: fixed;
+    top: 100px;
+    right: 0;
+    z-index: 3;
+    padding: 0 8px;
+}
+
+.notes-menu, .notes-menu:hover, .toggle-highlight, .toggle-highlight:hover  {
+    background-color: #f2f2f2;
+    color: black;
+}
+
+.note-arrow-left {
+    background-color: #f2f2f2;
+    color: black;
+    margin-right: 30%;
+}
+
+.eff-side {
+    background-color: #f2f2f2;
+    color: black;
+    margin-right: 30%;
+    will-change: transform;
+}
+
+
+.card-timestamp {
+    position: absolute;
+    right: 0;
+    font-style: italic;
+    padding-right: 10px;
+}
+
+.excerpt-block {
+    cursor: pointer;
+}
+
+
+.flex-container {
+    background-color: lightslategrey;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .flex-container > div {
+      padding-left: 5%;
+  }
+
+.switch {
+    margin-left: 15%;
+}
+.blue-highlight, .blue-highlight:hover {
+    background-color: #6AD0CA;
+}
+.green-highlight, .green-highlight:hover {
+    background-color: #6BD59A;
+}
+.yellow-highlight, .yellow-highlight:hover {
+    background-color: #DFCA45;
+}
+.orange-highlight, .orange-highlight:hover {
+    background-color: #E86F52;
+}
+
+.most-highligt, .most-highligt:hover {
+    background-color: yellow;
+}
+
+#blue [type="checkbox"].filled-in:not(:checked)+span:not(.lever):after {
+    border: 2px solid  #6AD0CA;
+}
+
+#blue [type="checkbox"].filled-in:checked+span:not(.lever):after {
+    background-color:  #6AD0CA;
+    border: 2px solid  #6AD0CA;
+}
+
+#green [type="checkbox"].filled-in:not(:checked)+span:not(.lever):after {
+    border: 2px solid  #6BD59A;
+}
+
+#green [type="checkbox"].filled-in:checked+span:not(.lever):after {
+    background-color:  #6BD59A;
+    border: 2px solid  #6BD59A;
+}
+
+#yellow [type="checkbox"].filled-in:not(:checked)+span:not(.lever):after {
+    border: 2px solid  #DFCA45;
+}
+
+#yellow [type="checkbox"].filled-in:checked+span:not(.lever):after {
+    background-color:  #DFCA45;
+    border: 2px solid  #DFCA45;
+}
+
+#orange [type="checkbox"].filled-in:not(:checked)+span:not(.lever):after {
+    border: 2px solid  #E86F52;
+}
+
+#orange [type="checkbox"].filled-in:checked+span:not(.lever):after {
+    background-color:  #E86F52;
+    border: 2px solid  #E86F52;
+}
+
+.color-box {
+    margin-top: 8%;
+}
+
+.comment {
+    line-height: 1.5;
+}
+
+.annotation-highlight {
+    padding: 10px 15px;
+    display: inline-block;
+    border: solid 1px #9e9e9e;
+    background: #f2f2f2;
+    border-radius: 2rem;
+}
+
+  
+  @media (max-width: 800px) {
+    .flex-container {
+      flex-direction: column;
+    }
+  }
+  @media (max-device-width: 600px) {
+    .sidenav {
+        width: 100%;
+    }
+  }

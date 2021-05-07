@@ -1,0 +1,78 @@
+<ccm-template key="main">
+    <nav id="slide-out" class="sidenav">
+        <!-- Dropdown Structure -->
+        <ul id="dropdown1" class="dropdown-content dropdown-item">
+            <li><a href="#!" onclick="changeAnnotationGroup('private', 'My annotations')">My Annotations</a></li>
+            <li><a href="#!" onclick="changeAnnotationGroup('public', 'Public annotations')">Public Annotations</a></li>
+            <li> <a href="#!" onclick="showMostHighligted('Most highlighted')">Most Highlighted</a></li>
+        </ul>
+        <ul id="dropdown2" class="dropdown-content">
+            <li><a onclick="changeSort('oldest', 'Oldest')" href="#!">Oldest</a></li>
+            <li><a onclick="changeSort('newest', 'Newest')" href="#!">Newest</a></li>
+        </ul>
+        <div class="flex-container">
+            <div style="display: flex; margin: 2%;">
+                <nav>
+                    <div class="nav-wrapper">
+                        <form style="background-color: darkcyan;">
+                            <div class="input-field">
+                                <input id="search" onkeyup="searchAnnotations(this.value)" type="search" required>
+                                <label class="label-icon" for="search"><i class="material-icons">search</i></label>
+                                <i onclick="clearSearch()" class="material-icons">close</i>
+                            </div>
+                        </form>
+                    </div>
+                </nav>
+                
+                <div style="float: right;">
+                    <a onclick="closeSidebar()" href="#"><i class="material-icons" style="float: right;">keyboard_arrow_right</i></a>
+                </div>
+            </div>
+            
+            <div class="nav-item">
+                <label id="blue">
+                    <input onclick="updateColorFilter('blue-highlight', this.checked)" type="checkbox"
+                        class="filled-in" checked="checked" />
+                    <span class="color-box"></span>
+                </label>
+                <label id="green">
+                    <input onclick="updateColorFilter('green-highlight', this.checked)" type="checkbox"
+                        class="filled-in" checked="checked" />
+                    <span class="color-box"></span>
+                </label>
+                <label id="yellow">
+                    <input onclick="updateColorFilter('yellow-highlight', this.checked)" type="checkbox"
+                        class="filled-in" checked="checked" />
+                    <span class="color-box"></span>
+                </label>
+                <label id="orange">
+                    <input onclick="updateColorFilter('orange-highlight', this.checked)" type="checkbox"
+                        class="filled-in" checked="checked" />
+                    <span class="color-box"></span>
+                </label>
+            </div>
+            <div style="display: flex;">
+                <div class="nav-item" style="margin-right: 5%;">
+                    <a id="group" class="dropdown-trigger" href="#!" data-target="dropdown1">Annotations: 
+                        <i class="material-icons right" style="margin-top: 2px; margin-left: 0px;">arrow_drop_down</i></a>
+                        <span id="group-badge" class="new badge" data-badge-caption="My annotations"></span>    
+                </div>
+                <div class="nav-item" style="margin-right: 5%;">
+                    <a id="sort" class="dropdown-trigger" href="#!" data-target="dropdown2">Sort:<i
+                            class="material-icons right" style="margin-top: 2px; margin-left: 0px;">arrow_drop_down</i></a>
+                            <span id="sort-badge" class="new badge" data-badge-caption="Newest"></span>
+                </div>
+            </div>
+        </div>
+        <div id="card-container"></div>
+    </nav>
+    
+    <a href="#" onclick="showAnnotations()" style="float: right;" data-target="slide-out" class="sidenav-trigger btn notes-menu"><i
+        class="material-icons">keyboard_arrow_left</i></a>
+        <a href="#" id="eye-on" title="hide highlights" onclick="toggleHighlights()" class="btn toggle-highlight"><i class="material-icons">remove_red_eye</i></a>
+        <a href="#" id="eye-off" style="display: none;" title="show highlights" onclick="toggleHighlights()" class="btn toggle-highlight"><img src="./resources/eye_off.svg"></a>
+        
+    <div id="text-content" oncontextmenu="handleTouchSelection(event)" onmouseup="handleSelection()">
+        
+    </div>
+</ccm-template>
