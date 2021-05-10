@@ -28,7 +28,7 @@ const COLORS = ['blue-highlight', 'green-highlight', 'yellow-highlight', 'orange
 
 const USER_ID = 'user-' + getRandomInt(3);
 const URI = window.location.origin; // window.location.href;
-
+let CONNECTION;
 //const settingDAO = new SettingDAO();
 //const annotationDAO = new AnnotationDAO();
 
@@ -54,22 +54,22 @@ function getRandomInt(max) {
     return Math.floor(Math.random() * Math.floor(max));
 }
 
-function showAllHighlights() {
-    let annotations = annotationDAO.read();
+async function showAllHighlights() {
+    let annotations = await annotationDAO.read();
     if (annotations) {
         hideAllHighlights();
         for (let ann of annotations) {
             var ab2 = new AnnotationBuilder().fromJSON(JSON.stringify(ann));
             ab2.result.target.toSelection();
-            const selection = document.getSelection();
+            let selection = document.getSelection();
             if (selection && !selection.isCollapsed) {
                 const range = selection.getRangeAt(0);
                 highlightRange(range, ann.clazz, ann.id);
             }
         }
-        let selection = document.getSelection() || window.getSelection();
-        if (selection) {
-            selection.removeAllRanges();
+        let selectionToRemove = document.getSelection() || window.getSelection();
+        if (selectionToRemove) {
+            selectionToRemove.removeAllRanges();
         }
         HIGHLIGHT_IS_VISIBLE = true;
     }
@@ -81,20 +81,35 @@ function hideAllHighlights() {
     HIGHLIGHT_IS_VISIBLE = false;
 }
 
-function toggleHighlights() {
+async function toggleHighlights() {
     if (HIGHLIGHT_IS_VISIBLE) {
         hideAllHighlights();
         HIGHLIGHT_IS_VISIBLE = false;
         document.getElementById('eye-on').style.display = 'none';
         document.getElementById('eye-off').style.display = 'block';
     } else {
-        showAllHighlights();
+        await showAllHighlights();
         HIGHLIGHT_IS_VISIBLE = true;
         document.getElementById('eye-on').style.display = 'block';
         document.getElementById('eye-off').style.display = 'none';
     }
 }
 
+function setConnection(connection) {
+    this.CONNECTION = connection;
+}
+
+function getConnection() {
+    return this.CONNECTION;
+}
+
+function setUserKey(userKey) {
+    this.USER_ID = userKey;
+}
+
+function getUserId() {
+    return this.USER_ID;
+}
 
 $(document).ready(function () {
     $("#group").dropdown();

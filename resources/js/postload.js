@@ -8,4 +8,4 @@ document.addEventListener('selectionchange', (event) => {
     handleFireFoxSelection(event);
 });
 
-showAllHighlights();
+//showAllHighlights();

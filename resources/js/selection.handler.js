@@ -74,7 +74,7 @@ function hideToolbar(toolbar) {
     }
 }
 
-function highlight(color, clazz) {
+async function highlight(color, clazz) {
     const timeElapsed = Date.now();
     const today = new Date(timeElapsed);
     let date = today.toDateString()
@@ -94,6 +94,7 @@ function highlight(color, clazz) {
         annotation.color = color;
         annotation.clazz = clazz;
         annotation.excerpt = selText;
+        annotation.creator = getUserId();
         let annotations = localStorage.getItem(ANNOTATIONS_ID);
         if (annotations) {
             annotations = JSON.parse(annotations);
@@ -102,7 +103,7 @@ function highlight(color, clazz) {
             annotations = [];
             annotations.push(annotation);
         }
-        annotationDAO.create(annotation);
+        await annotationDAO.create(annotation);
     }
     localStorage.removeItem(TEMP_SELECTION_ID);
     const toolbar = document.getElementById(HIGHLIGHT_TOOLBAR_ID);

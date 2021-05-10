@@ -13,11 +13,17 @@ class SettingDAO {
     /**
      * Creates setting of user for uri
      */
-    create() {
-        if (!this.read(USER_ID, URI)) {
-            let user_settings = this.getUserSettings();
+    async create() {
+        const connection = getConnection();
+        if (!connection) {
+            console.log("Connection not open!");
+            return;
+        }
+        let isSettingExist = await this.read();
+        if (!isSettingExist) {
+            let user_settings =await this.getUserSettings();
             const user_setting = {
-                userId: USER_ID,
+                userId: getUserId(),
                 uri: URI,
                 sort_type: 'newest'
             }
@@ -37,23 +43,28 @@ class SettingDAO {
      * @param {string} userId 
      * @param {string} uri 
      */
-    read() {
-        let user_settings = localStorage.getItem(USER_SETTINGS);
-        if (user_settings) {
-            user_settings = JSON.parse(user_settings);
-            return user_settings.find(user_setting => user_setting.userId === USER_ID && user_setting.uri === URI);
+    async read() {
+        const connection = getConnection();
+        if (!connection) {
+            console.log("Connection not open!");
+            return;
         }
+        let user_settings = await this.getUserSettings();
+        if (user_settings) {
+            return user_settings.find(user_setting => user_setting.userId === getUserId() && user_setting.uri === URI);
+        }
+
     }
 
     /**
      * Updates setting of user for given uri
      * @param {Setting} setting 
      */
-    update(setting) {
+    async update(setting) {
 
-        const user_settings = this.getUserSettings();
+        const user_settings = await this.getUserSettings();
         user_settings.forEach(user_setting => {
-            if (user_setting.userId === USER_ID && user_setting.uri === URI) {
+            if (user_setting.userId === getUserId() && user_setting.uri === URI) {
                 user_setting.sort_type = setting.sort_type;
                 COLORS.forEach(color => {
                     user_setting[color] = setting[color];
@@ -63,7 +74,7 @@ class SettingDAO {
         this.saveUserSettings(user_settings);
     }
 
-    delete() {
+    async delete() {
         // Not required now
     }
 
@@ -84,20 +95,40 @@ class SettingDAO {
     }
 
 
-    getUserSettings() {
-        let user_settings = localStorage.getItem(USER_SETTINGS);
-        if (!user_settings) {
+    async getUserSettings() {
+        const connection = getConnection();
+        if (!connection) {
+            console.log("Connection not open!");
+            return;
+        }
+        const user_settings = await connection.get(USER_SETTINGS);
+        if (!user_settings || !user_settings.value) {
             return [];
         } else {
-            return JSON.parse(user_settings);
+            return JSON.parse(user_settings.value);
         }
     }
 
-    saveUserSettings(user_settings) {
-        localStorage.setItem(USER_SETTINGS, JSON.stringify(user_settings));
+    async saveUserSettings(user_settings) {
+        const connection = getConnection();
+        if (!connection) {
+            console.log("Connection not open!");
+            return;
+        }
+        connection.set({
+            "key": USER_SETTINGS,
+            "value": JSON.stringify(user_settings)
+        }).then(
+            success => {
+                console.log('setting success')
+            }
+        );
     }
 
 }
+
+
+
 
 
 class AnnotationDAO {
@@ -107,76 +138,112 @@ class AnnotationDAO {
         this.annotationId = undefined;
      }
 
-    create(annotation) {
-        if (!this.checkAnnotationEntry(USER_ID, URI)) {
+    async create(annotation) {
+        const connection = getConnection();
+        if (!connection) {
+            console.log("Connection not open!");
+            return;
+        }
+        let entryxist = await this.checkAnnotationEntry(getUserId(), URI);
+        if (!entryxist) {
             const ID = generateUUID();
             const newEntry = {
                 id: ID,
-                userId: USER_ID,
+                userId: getUserId(),
                 uri: URI
             }
-            this.addAnnotationEntry(newEntry);
+            await this.addAnnotationEntry(newEntry);
             const annotations = [];
             annotations.push(annotation);
-            localStorage.setItem(ID, JSON.stringify(annotations));
+            connection.set({
+                "key": ID,
+                "value": JSON.stringify(annotations)
+            });
             this.annotationListId = ID;
         } else {
-            let annotations = localStorage.getItem(this.annotationListId);
-            if (annotations) {
-                annotations = JSON.parse(annotations);
+            let annotations = await connection.get(this.annotationListId);
+            if (annotations && annotations.value) {
+                annotations = JSON.parse(annotations.value);
             } else {
                 annotations = [];
             }
+            
             annotations.push(annotation);
-            localStorage.setItem(this.annotationListId, JSON.stringify(annotations));
+            connection.set({
+                "key": this.annotationListId,
+                "value": JSON.stringify(annotations)
+            });
         }
     }
 
-    read() {
-        if (!this.checkAnnotationEntry(USER_ID, URI)) {
+    async read() {
+        const connection = getConnection();
+        if (!connection) {
+            console.log("Connection not open!");
             return;
         }
-        const annotations = localStorage.getItem(this.annotationListId);
-        if (annotations) {
-            return JSON.parse(annotations);
+        let isExist = await this.checkAnnotationEntry(getUserId(), URI);
+        if (!isExist) {
+            return;
+        }
+        const annotations = await connection.get(this.annotationListId);
+        console.log(annotations)
+        if (annotations && annotations.value) {
+            return JSON.parse(annotations.value);
         }
     }
 
-    readById(annotationId) {
-        if (!this.checkAnnotationEntry(USER_ID, URI)) {
+    async readById(annotationId) {
+        const connection = getConnection();
+        if (!connection) {
+            console.log("Connection not open!");
             return;
         }
-        let annotations = localStorage.getItem(this.annotationListId);
-        if (annotations) {
-            annotations = JSON.parse(annotations);
+        let isEntryExist = await this.checkAnnotationEntry(getUserId(), URI);
+        if (!isEntryExist) {
+            return;
+        }
+        let annotations = await connection.get(this.annotationListId);
+        if (annotations && annotations.value) {
+            annotations = JSON.parse(annotations.value);
             return annotations.find(annotation => annotation.id === annotationId);
         }
         
     }
 
-    update(annotation) {
-        this.delete(annotation.id);
-        this.create(annotation);
+    async update(annotation) {
+        await this.delete(annotation.id);
+        await this.create(annotation);
 
     }
 
-    delete(annotationId) {
-        if (!this.checkAnnotationEntry(USER_ID, URI)) {
+    async delete(annotationId) {
+        const connection = getConnection();
+        if (!connection) {
+            console.log("Connection not open!");
             return;
         }
-        let annotations = localStorage.getItem(this.annotationListId);
-        if (annotations) {
-            annotations = JSON.parse(annotations);
+        let isEntryExist = await this.checkAnnotationEntry(getUserId(), URI);
+        if (!isEntryExist) {
+            return;
+        }
+        let annotations = await connection.get(this.annotationListId);
+        if (annotations && annotations.value) {
+            annotations = JSON.parse(annotations.value);
             let filterdAnnotations = annotations.filter(annotation => { return annotation.id !== annotationId; });
-            localStorage.setItem(this.annotationListId, JSON.stringify(filterdAnnotations));
+            await connection.set({
+                "key": this.annotationListId,
+                "value": JSON.stringify(filterdAnnotations)
+            });
         }
     }
 
-    checkAnnotationEntry(userId, uri) {
+    async checkAnnotationEntry(userId, uri) {
         if (this.annotationListId) {
+            console.log('id exist', this.annotationListId)
             return true;
         } else {
-            const entry = this.getAnnotationEntry(userId, uri);
+            const entry = await this.getAnnotationEntry(userId, uri);
             if (entry) {
                 this.annotationListId = entry.id;
                 return true;
@@ -185,28 +252,48 @@ class AnnotationDAO {
         return false;
     }
 
-    getAnnotationEntry(userId, uri) {
-        let user_annotation_list = localStorage.getItem(USER_ANNOTATION_LIST);
-        if (user_annotation_list) {
-            user_annotation_list = JSON.parse(user_annotation_list);
+    async getAnnotationEntry(userId, uri) {
+        const connection = getConnection();
+        if (!connection) {
+            console.log("Connection not open!");
+            return;
+        }
+        let user_annotation_list = await connection.get(USER_ANNOTATION_LIST);
+        if (user_annotation_list && user_annotation_list.value) {
+            user_annotation_list = JSON.parse(user_annotation_list.value);
             return user_annotation_list.find(entry => entry.userId === userId && entry.uri === uri);
         }
     }
 
-    addAnnotationEntry(entry) {
-        let user_annotation_list = localStorage.getItem(USER_ANNOTATION_LIST);
-        if (user_annotation_list) {
-            user_annotation_list = JSON.parse(user_annotation_list);
+    async addAnnotationEntry(entry) {
+        const connection = getConnection();
+        if (!connection) {
+            console.log("Connection not open!");
+            return;
+        }
+        let user_annotation_list = await connection.get(USER_ANNOTATION_LIST);
+        if (user_annotation_list && user_annotation_list.value) {
+            user_annotation_list = JSON.parse(user_annotation_list.value);
         } else {
             user_annotation_list = [];
         }
         user_annotation_list.push(entry);
-        localStorage.setItem(USER_ANNOTATION_LIST, JSON.stringify(user_annotation_list));
+        connection.set({
+            "key": USER_ANNOTATION_LIST,
+            "value": JSON.stringify(user_annotation_list)
+        }).then(
+            success => {
+                console.log('success add  entry', success)
+            }
+        );
     }
 
 }
 
-
-const settingDAO = new SettingDAO();
-settingDAO.create(); // Create default settings
-const annotationDAO = new AnnotationDAO(); 
+let settingDAO;
+let annotationDAO;
+function initDAO() {
+    settingDAO = new SettingDAO();
+    settingDAO.create(); // Create default settings
+    annotationDAO = new AnnotationDAO();   
+}

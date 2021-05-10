@@ -1,7 +1,7 @@
 
 let FOCUS_NODE;
 
-function showAnnotations(searchtext) {
+async function showAnnotations(searchtext) {
     let cardsContainer = document.getElementById(CARD_CONTAINER_ID);
     if (cardsContainer) {
         cardsContainer.innerHTML = '';
@@ -11,22 +11,23 @@ function showAnnotations(searchtext) {
     let annotations;
     const group = settingDAO.getGroup();
     if (group === 'public') {
-        annotations = getPublicAnnotations();
+        annotations = await getPublicAnnotations();
     } else {
-        annotations = annotationDAO.read(); // get own annotations
+        annotations = await annotationDAO.read(); // get own annotations
     }
+
     if (annotations) {
-        annotations = resolveSettings(annotations, searchtext);
+        annotations = await resolveSettings(annotations, searchtext);
         generateCardList(cardsContainer, annotations, group);
     }
     openSidebar();
 
 }
 
-function showSelectedAnnotation(annotationId) {
+async function showSelectedAnnotation(annotationId) {
 
     let cardsContainer = document.getElementById(CARD_CONTAINER_ID);
-    const annotation = annotationDAO.readById(annotationId);
+    const annotation = await annotationDAO.readById(annotationId);
 
     if (annotation && cardsContainer) {
         const cardItem = buildCard(annotation, 'private')
@@ -56,7 +57,7 @@ function buildCard(annotation, group) {
         <div onmouseout="focusHighlight('${annotation.id}', false)" onmouseover="focusHighlight('${annotation.id}', true)" class="card">
           <div class="card-content black-text">
               <div>
-                  <span><b>Guest</b></span>
+                  <span><b>${annotation.creator}</b></span>
                   ${group !== 'public' ? `
                   <span class="switch">
                     <label>
@@ -105,18 +106,18 @@ function buildCard(annotation, group) {
     `;
 }
 
-function removeAnnotation(id) {
+async function removeAnnotation(id) {
     let annotation = document.getElementById(id);
     if (id) {
         annotation.remove();
-        annotationDAO.delete(annotation.id);
+        await annotationDAO.delete(annotation.id);
         hideAllHighlights();
-        showAllHighlights();
+        await showAllHighlights();
     }
 }
 
-function showCommentBox(node, id) {
-    let annotations = annotationDAO.read();
+async function showCommentBox(node, id) {
+    let annotations = await annotationDAO.read();
     const commentBox = node.querySelector("#" + id + "-box");
     const cardBtn = node.querySelector("#" + id + "-btn");
     const commentArea = node.querySelector("#" + id + "-area");
@@ -140,15 +141,15 @@ function hideCommentBox(node, id) {
     cardBtn.style.display = 'block';
 }
 
-function saveComment(node, id) {
-    let annotations = annotationDAO.read();
+async function saveComment(node, id) {
+    let annotations = await annotationDAO.read();
     let commentArea = node.querySelector("#" + id + "-area");
     let commentValue = node.querySelector("#" + id + "-comment");
     if (commentArea && annotations) {
         for (let annotation of annotations) {
             if (annotation.id === id) {
                 annotation.bodyValue = commentArea.value;
-                annotationDAO.update(annotation);
+                await annotationDAO.update(annotation);
                 break;
             }
         }
@@ -157,16 +158,16 @@ function saveComment(node, id) {
     }
 }
 
-function changePermission(annotationId, permission) {
-    const annotation = annotationDAO.readById(annotationId);
+async function changePermission(annotationId, permission) {
+    const annotation = await annotationDAO.readById(annotationId);
     if (annotation) {
         annotation.permission = permission;
-        annotationDAO.update(annotation);
+        await annotationDAO.update(annotation);
     }
 }
 
-function toogleNoteBox(e, id) {
-    let annotation = annotationDAO.readById(id);
+async function toogleNoteBox(e, id) {
+    let annotation = await annotationDAO.readById(id);
     let comment = e.parentNode.querySelector(".annotation-comment");
     let noteBox = e.parentNode.querySelector(".note-box");
     let noteArea = e.parentNode.querySelector(".note-area");
@@ -251,8 +252,8 @@ function focusHighlight(annotationId, focus) {
 
 }
 
-function goToHighlight(annotationId) {
-    let annotation = annotationDAO.readById(annotationId);
+async function goToHighlight(annotationId) {
+    let annotation = await annotationDAO.readById(annotationId);
     let ab = new AnnotationBuilder().fromJSON(JSON.stringify(annotation));
     ab.result.target.toSelection(true);
     let selection = document.getSelection() || window.getSelection();
@@ -261,17 +262,17 @@ function goToHighlight(annotationId) {
     }
 }
 
-function resolveSettings(annotations, searchtext) {
-    annotations = filterByColor(annotations);
-    annotations = sort(annotations);
+async function resolveSettings(annotations, searchtext) {
+    annotations = await filterByColor(annotations);
+    annotations = await sort(annotations);
     if (searchtext) {
         annotations = filterBySearchtext(annotations, searchtext);
     }
     return annotations;
 }
 
-function filterByColor(annotations) {
-    let user_setting = settingDAO.read();
+async function filterByColor(annotations) {
+    let user_setting = await settingDAO.read();
     if (annotations && user_setting) {
         return annotations.filter(a => {
             return a.clazz && user_setting[a.clazz];
@@ -279,8 +280,8 @@ function filterByColor(annotations) {
     }
 }
 
-function sort(annotations) {
-    let user_setting = settingDAO.read();
+async function sort(annotations) {
+    let user_setting = await settingDAO.read();
     if (annotations && user_setting) {
         const type = user_setting[SORT_KEY];
         if (type === SORT_NEWEST) {

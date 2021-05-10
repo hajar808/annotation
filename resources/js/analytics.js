@@ -1,12 +1,12 @@
 
-function showMostHighligted(label) {
+async function showMostHighligted(label) {
     const badge = document.getElementById('group-badge');
     badge.setAttribute('data-badge-caption', label);
-    
+
     const root = document.getElementById(TEXT_CONTENT_ID);
-    
-    let sorted_list = mergeAnnotations().sort( (a1, a2) => a2.counter - a1.counter);
-    
+    let mergedAnnotations = await mergeAnnotations();
+    let sorted_list = mergedAnnotations.sort((a1, a2) => a2.counter - a1.counter);
+
     if (sorted_list && sorted_list.length > 0) {
         let annotation = sorted_list[0].value;
         if (annotation) {
@@ -24,40 +24,50 @@ function showMostHighligted(label) {
 }
 
 
-function getPublicAnnotations() {
-    let annotation_list = localStorage.getItem(USER_ANNOTATION_LIST);
+async function getPublicAnnotations() {
+    const connection = getConnection();
+    if (!connection) {
+        console.log("Connection not open!");
+        return;
+    }
+    let annotation_list = await connection.get(USER_ANNOTATION_LIST);
     const public_annotations = [];
-    if (annotation_list) {
-        annotation_list = JSON.parse(annotation_list);
-        annotation_list.forEach(annotation_item => {
-            let annotations = localStorage.getItem(annotation_item.id);
-            if (annotations) {
-                annotations = JSON.parse(annotations);
-                annotations.forEach(annotation => {
+    if (annotation_list && annotation_list.value) {
+        annotation_list = JSON.parse(annotation_list.value);
+        for(let annotation_item of annotation_list) {
+            let annotatons = await connection.get(annotation_item.id);
+            if (annotatons.value) {
+                annotatons = JSON.parse(annotatons.value);
+                annotatons.forEach(annotation => {
                     if (annotation.permission) {
                         public_annotations.push(annotation);
                     }
                 })
             }
-        });
+        }
     }
-
     return public_annotations;
 }
 
 
-function mergeAnnotations() {
-    let annotation_list = localStorage.getItem(USER_ANNOTATION_LIST);
+async function mergeAnnotations() {
+    
     const merged_items = [];
-    if (annotation_list) {
-        annotation_list = JSON.parse(annotation_list);
-        annotation_list.forEach(annotation_item => {
-            let annotations = localStorage.getItem(annotation_item.id);
-            if (annotations) {
-                annotations = JSON.parse(annotations);
+    const connection = getConnection();
+    if (!connection) {
+        console.log("Connection not open!");
+        return;
+    }
+    let annotation_list = await connection.get(USER_ANNOTATION_LIST);
+    if (annotation_list && annotation_list.value) {
+        annotation_list = JSON.parse(annotation_list.value);
+        for(let annotation_item of annotation_list) {
+            let annotations = await connection.get(annotation_item.id);
+            if (annotations && annotations.value) {
+                annotations = JSON.parse(annotations.value);
                 merge(merged_items, annotations);
             }
-        });
+        }
     }
 
     return merged_items;
@@ -81,18 +91,18 @@ function merge(list, annotations) {
         ann_selectors.forEach(selector1 => {
             found_item = list.find(item => item.selector.find(selector2 => compare(selector1, selector2)));
             if (found_item) {
-               return;
+                return;
             }
         });
         if (found_item) {
             found_item.counter += 1;
-        }else{
+        } else {
             const newItem = {
                 counter: 1,
                 value: annotation,
                 selector: annotation.target.selector
             }
-            list.push(newItem); 
+            list.push(newItem);
         }
 
 
